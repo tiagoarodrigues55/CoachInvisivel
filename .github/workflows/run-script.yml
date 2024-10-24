@@ -28,4 +28,4 @@ jobs:
 
       # Passo 4: Executa o script
       - name: Run the Python script
-        run: python script.py
+        run: python main.py
