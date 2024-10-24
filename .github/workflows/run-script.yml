@@ -1,0 +1,31 @@
+name: Executar Script Python a cada 15 minutos
+
+on:
+  schedule:
+    # Executa o script a cada 15 minutos
+    - cron: '*/15 * * * *'
+
+jobs:
+  run-python-script:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Passo 1: Baixa o repositório
+      - name: Check out the repository
+        uses: actions/checkout@v3
+
+      # Passo 2: Configura o Python
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.8'
+
+      # Passo 3: Instala dependências
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests pandas openai yagmail pywhatkit
+
+      # Passo 4: Executa o script
+      - name: Run the Python script
+        run: python script.py
