@@ -141,8 +141,8 @@ print('df filtrado', df.shape)
 df.to_excel('transcripts.xlsx')
 
 
-if len(df['id']) == 0:
-    exit()
+# if len(df['id']) == 0:
+exit()
 #%%
 
 
