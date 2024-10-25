@@ -27,17 +27,22 @@ jobs:
           python -m pip install --upgrade pip
           pip install requests pandas openai yagmail pywhatkit openpyxl
 
-      # Passo 4: Configura variáveis de ambiente
-      - name: Set environment variables
+      # Passo 4: Configura variáveis de ambiente a partir do environment "CoachInvisivel"
+      - name: Load environment variables
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          FIRELIES_API_KEY: ${{ secrets.FIRELIES_API_KEY }}
+          EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
         run: |
           echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" >> $GITHUB_ENV
           echo "FIRELIES_API_KEY=${{ secrets.FIRELIES_API_KEY }}" >> $GITHUB_ENV
           echo "EMAIL_PASSWORD=${{ secrets.EMAIL_PASSWORD }}" >> $GITHUB_ENV
 
-      # Passo 5: Executa o script
+      # Passo 5: Executa o script utilizando o environment correto
       - name: Run the Python script
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           FIRELIES_API_KEY: ${{ secrets.FIRELIES_API_KEY }}
           EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
         run: python script.py
+    environment: CoachInvisivel  # Define o environment
