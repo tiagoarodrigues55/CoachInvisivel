@@ -27,6 +27,17 @@ jobs:
           python -m pip install --upgrade pip
           pip install requests pandas openai yagmail pywhatkit
 
-      # Passo 4: Executa o script
+      # Passo 4: Configura variáveis de ambiente
+      - name: Set environment variables
+        run: |
+          echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" >> $GITHUB_ENV
+          echo "FIRELIES_API_KEY=${{ secrets.FIRELIES_API_KEY }}" >> $GITHUB_ENV
+          echo "EMAIL_PASSWORD=${{ secrets.EMAIL_PASSWORD }}" >> $GITHUB_ENV
+
+      # Passo 5: Executa o script
       - name: Run the Python script
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          FIRELIES_API_KEY: ${{ secrets.FIRELIES_API_KEY }}
+          EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
         run: python script.py
