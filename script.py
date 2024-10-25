@@ -142,7 +142,7 @@ df.to_excel('transcripts.xlsx')
 
 
 # if len(df['id']) == 0:
-exit()
+# exit()
 #%%
 
 
@@ -184,6 +184,8 @@ def gerar_message(row):
     # Gera o HTML com os valores de cada linha.
     message = f"""
     <html>
+    <meta charset="UTF-8">
+
         <body style="font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 20px;">
             <div style="background-color: #ffffff; padding: 20px; border-radius: 8px; 
                         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); max-width: 600px; margin: auto;">
