@@ -127,9 +127,11 @@ users_df = pd.read_excel('users.xlsx')
 print('users_df carregado', users_df.shape)
 
 df = process_transcripts_to_df(transcripts, users_df)
+print('df carregado', df.shape)
 
 df = df[~df['id'].isin(ids_df['id'])]
-
+print('df filtrado', df.shape)
+    
 
 df.to_excel('transcripts.xlsx')
 
