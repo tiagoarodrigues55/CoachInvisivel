@@ -4,6 +4,7 @@ on:
   schedule:
     # Executa o script a cada 15 minutos
     - cron: '*/15 * * * *'
+  workflow_dispatch:  # Adiciona a opção de execução manual
 
 jobs:
   run-python-script:
