@@ -108,7 +108,11 @@ def process_transcripts_to_df(transcripts, users_df):
         sentences = json.dumps(transcript["sentences"], ensure_ascii=False)
 
         # Encontra emails correspondentes aos nomes no users_df
-        matching_emails = users_df[users_df['nome'].isin(speaker_names)]['email'].tolist()
+        matching_emails = users_df[
+            users_df['nome'].apply(lambda x: any(nome.strip() in speaker_names for nome in x.split(', ')))
+        ]['email'].tolist()
+
+        # Unir os emails em uma única string, ou definir como None se não houver correspondência
         email = ", ".join(matching_emails) if matching_emails else None
 
         # Cria um dicionário com as informações necessárias
