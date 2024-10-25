@@ -8,6 +8,7 @@ import os
 
 OPENAI_KEY = os.getenv("OPENAI_API_KEY")
 API_KEY = os.getenv("FIRELIES_API_KEY")
+print('API_KEY carregado', API_KEY)
 EMAIL_PASSWORD = os.getenv("EMAIL_PASSWORD")
 
 client = OpenAI(api_key=OPENAI_KEY)
@@ -71,6 +72,7 @@ response = requests.post(
 # Check if the request was successful
 data = response.json()
 transcripts = data.get("data", {}).get("transcripts", [])
+print('transcripts carregados', len(transcripts))
 
 def converter_timestamp_para_data_brasilia(timestamp):
     # Define o fuso horário de Brasília (UTC-3)
@@ -131,7 +133,7 @@ print('df carregado', df.shape)
 
 df = df[~df['id'].isin(ids_df['id'])]
 print('df filtrado', df.shape)
-    
+
 
 df.to_excel('transcripts.xlsx')
 
