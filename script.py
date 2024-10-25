@@ -164,119 +164,10 @@ def identificar_objeções(sentencas):
 
 df['objecoes'] = df['sentences'].apply(identificar_objeções)
 
-#%%
-
-# def analisar_topicos(sentencas):
-#     # Formata o prompt com as sentenças fornecidas
-#     prompt = (
-#         """"Você irá atuar como um analista de transcrições de reuniões de vendas, avaliando as falas dos participantes com base em cinco dimensões fundamentais extraídas do livro 'The Salesperson’s Secret Code'. As dimensões são:
-
-#         Fulfilment (Realização): Demonstrar satisfação com o progresso ou metas alcançadas. Busque frases que indiquem ambição ou busca por excelência pessoal.
-#         Control (Controle): Identificar planejamento e senso de responsabilidade. Veja se os participantes assumem responsabilidade pelos resultados, mencionam planos claros, ou evitam atribuir culpa a fatores externos.
-#         Resilience (Resiliência): Procure sinais de capacidade de superar obstáculos e adaptação a desafios. Busque exemplos de perseverança após contratempos.
-#         Influence (Influência): Avalie se os participantes conseguem influenciar outras pessoas, seja dentro da equipe ou com clientes, e se mostram capacidade de construir redes de apoio.
-#         Communication (Comunicação): Observe a clareza, objetividade e eficácia na comunicação. Identifique quando a comunicação gera engajamento e promove colaboração.
-#         Você deverá:
-
-#         Destacar trechos relacionados a cada dimensão.
-#         Oferecer uma análise breve sobre como cada dimensão foi demonstrada ou ausente.
-#         Fornecer recomendações para melhorar em cada dimensão, se necessário.
-#                 \n\n"""
-#         + sentencas
-#     )
-#     # Chamada para a API da OpenAI
-#     completion = client.chat.completions.create(
-#         model="gpt-4o-mini",
-#         messages=[{"role": "user", "content": prompt}]
-#     )
-
-#     # Retorna a resposta da API
-
-#     return completion.choices[0].message.content.replace('```', '').replace('html', '')  # Acessando o conteúdo corretamente
-
-# df['topicos'] = df['sentences'].apply(analisar_topicos)
 
 
 
 
-#%%
-
-import smtplib
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
-
-# Configuração da conta do Outlook
-EMAIL = "assistente@coachinvisivel.com"
-PASSWORD = "Leadera@2024*"
-SMTP_SERVER = "mail.coachinvisivel.com"  # Altere para o servidor SMTP do HostGator
-SMTP_PORT = 587  # A porta 587 é geralmente usada para SMTP com TLS
-
-
-
-# Função para enviar e-mails
-def enviar_email(row):
-    destinatario = 'tiago.americano.03@gmail.com'
-    assunto = f"Relatório Coach Invisível {row['date']}"
-
-    # Configurando o e-mail em HTML
-    html_body = f"""
-    <html>
-    <body>
-        <h2>Resumo Principal</h2>
-        <p>{row['gist']}</p>
-
-        <h3>Principais pontos</h3>
-        <pre>{row['bullet_gist']}</pre>
-
-        <h3>Itens de Ação</h3>
-        <pre>{row['action_items']}</pre>
-
-        <h3>Visão Geral</h3>
-        <p>{row['overview']}</p>
-        
-        <h3>Objeções</h3>
-        <p>{row['objecoes']}</p>
-        
-        <h3>Próximos passos</h3>
-        <p>{row['shorthand_bullet']}</p>
-    </body>
-    </html>
-    """       
-    
-    print(html_body)
-
-    # Criando a mensagem MIME
-    msg = MIMEMultipart()
-    msg['From'] = EMAIL
-    msg['To'] = destinatario
-    # msg['Cc'] =  row['email']
-    msg['Subject'] = assunto
-    msg.attach(MIMEText(html_body, 'html'))
-
-    # Enviando o e-mail via SMTP
-    try:
-        with smtplib.SMTP(SMTP_SERVER, SMTP_PORT) as server:
-            server.starttls()  # Inicia a comunicação segura
-            server.login(EMAIL, PASSWORD)  # Login na conta
-            server.sendmail(EMAIL, destinatario, msg.as_string())
-        print(f"E-mail enviado para {destinatario}!")
-    except Exception as e:
-        print(f"Erro ao enviar e-mail para {destinatario}: {e}")
-
-
-
-
-#%%
-import pywhatkit
-
-def send_msg(message, number = "+5511992481655"):
-    now = datetime.now()
-    hour = now.hour
-    minute = now.minute + 1
-    print(number, message, hour, minute, 15, True, 5)
-    pywhatkit.sendwhatmsg(number, message, hour, minute, 15, True, 5)
-
-#%%
 
 import re
 
@@ -355,28 +246,6 @@ def gerar_message(row):
 
 df['message'] = df.apply(gerar_message, axis=1)
 
-# Cria a nova coluna 'message' aplicando a função `gerar_html` em cada linha do DataFrame.
-
-
-#%%
-
-# def formatar_html(html):
-#     # Formata o prompt com as sentenças fornecidas
-#     prompt = (
-#         "Formate meu html de forma que as informações fiquem estruturadas como um email profissional: \n\n"
-#         + html + "Me retorne apenas um código html como resposta."
-#     )
-#     # Chamada para a API da OpenAI
-#     completion = client.chat.completions.create(
-#         model="gpt-4o-mini",
-#         messages=[{"role": "user", "content": prompt}]
-#     )
-
-#     # Retorna a resposta da API
-
-#     return completion.choices[0].message.content.replace('```', '').replace('html', '')  # Acessando o conteúdo corretamente
-
-# df['html'] = df['message'].apply(identificar_objeções)
 
 
 
