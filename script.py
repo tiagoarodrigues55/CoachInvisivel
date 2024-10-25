@@ -318,7 +318,7 @@ def send_mail(subject, message, emails):
     yag.send(
         to=['tiago.americano.03@gmail.com']+emails,
         subject=subject,
-        contents='Segue em anexo o relatório em PDF.',
+        contents='Segue o relatório',
         attachments=[html_file]  # Anexa o PDF gerado
     )
 
