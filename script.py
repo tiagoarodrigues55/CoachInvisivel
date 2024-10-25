@@ -23,7 +23,7 @@ API_ENDPOINT = "https://api.fireflies.ai/graphql"
 query = """
 query LastTenTranscripts {
   transcripts(
-    limit: 10
+    limit: 1
     skip: 0
   ) {
      id
@@ -131,8 +131,8 @@ print('users_df carregado', users_df.shape)
 df = process_transcripts_to_df(transcripts, users_df)
 print('df carregado', df.shape)
 
-df = df[~df['id'].isin(ids_df['id'])]
-print('df filtrado', df.shape)
+# df = df[~df['id'].isin(ids_df['id'])]
+# print('df filtrado', df.shape)
 
 
 df.to_excel('transcripts.xlsx')
@@ -396,10 +396,10 @@ for _, row in df.iterrows():
     
     # Cria a lista final para 'to'
     yag.send(
-        # to=['tiago.americano.03@gmail.com'],
-        to=['tiago.americano.03@gmail.com']+email_list,
+        to=['tiago.americano.03@gmail.com'],
+        # to=['tiago.americano.03@gmail.com']+email_list,
         
-        subject=f'Relatório Coach Invisível {row.date}',
+        subject=f'Relatório Coach Invisível2 {row.date}',
         contents=row['message']
     )
     print('E-mail enviado com sucesso!')
