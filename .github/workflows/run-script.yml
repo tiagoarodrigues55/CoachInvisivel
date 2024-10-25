@@ -25,7 +25,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install requests pandas openai yagmail pywhatkit openpyxl
+          pip install requests pandas openai yagmail pywhatkit openpyxl supabase
 
       # Passo 4: Configura variáveis de ambiente a partir do environment "CoachInvisivel"
       - name: Load environment variables
