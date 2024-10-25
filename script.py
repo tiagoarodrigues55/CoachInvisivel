@@ -5,12 +5,21 @@ import pandas as pd
 from openai import OpenAI
 import yagmail
 import os
+from supabase import create_client, Client
+import ast
+
+# Configuração
+
+
 
 OPENAI_KEY = os.getenv("OPENAI_API_KEY")
 API_KEY = os.getenv("FIRELIES_API_KEY")
 EMAIL_PASSWORD = os.getenv("EMAIL_PASSWORD")
-#%%
+SUPABASE_URL = os.getenv("SUPABASE_URL")
+SUPABASE_KEY = os.getenv("SUPABASE_KEY")
+# Configurar o cliente Supabase
 
+supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 # Configuração
 yag = yagmail.SMTP('admin@coachinvisivel.com', EMAIL_PASSWORD)
 
