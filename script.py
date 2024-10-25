@@ -121,8 +121,11 @@ def process_transcripts_to_df(transcripts, users_df):
 
 # Gerando o DataFrame
 ids_df = pd.read_excel('ids.xlsx')
+print('ids_df carregado', ids_df.shape)
 
 users_df = pd.read_excel('users.xlsx')
+print('users_df carregado', users_df.shape)
+
 df = process_transcripts_to_df(transcripts, users_df)
 
 df = df[~df['id'].isin(ids_df['id'])]
