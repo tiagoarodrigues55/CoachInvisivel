@@ -263,17 +263,27 @@ for _, row in df.iterrows():
     email_list = row['email'].split(',')
     email_list = [email.strip() for email in email_list]
     
+    html_file = 'relatorio.html'
+    with open(html_file, "w", encoding="utf-8") as arquivo:
+        arquivo.write(row['message'])
     # Cria a lista final para 'to'
+    # Converte HTML em PDF e salva no disco
+    
+    # Converte HTML para PDF
+    
+    # Envia o e-mail com o PDF anexado
+    
     yag.send(
         to=['tiago.americano.03@gmail.com'],
         # to=['tiago.americano.03@gmail.com']+email_list,
-        
-        subject=f'Relatório Coach Invisível2 {row.date}',
-        contents=row['message']
+        subject=f'Relatório Coach Invisível3 {row.date}',
+        contents='Segue a baixo o relatório.',
+        attachments=[html_file]  # Anexa o html gerado
     )
-    print('E-mail enviado com sucesso!')
-    # send_msg(row['message'])
+    
+    print("E-mail enviado com sucesso!")
+
 
 new_df = df[['id', 'names', 'email']]
 
-pd.concat([new_df, ids_df])[['id', 'names', 'email']].to_excel('ids.xlsx')
+# pd.concat([new_df, ids_df])[['id', 'names', 'email']].to_excel('ids.xlsx')
