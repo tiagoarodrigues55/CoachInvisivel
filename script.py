@@ -8,7 +8,6 @@ import os
 
 OPENAI_KEY = os.getenv("OPENAI_API_KEY")
 API_KEY = os.getenv("FIRELIES_API_KEY")
-print('API_KEY carregado', API_KEY)
 EMAIL_PASSWORD = os.getenv("EMAIL_PASSWORD")
 
 client = OpenAI(api_key=OPENAI_KEY)
@@ -23,7 +22,7 @@ API_ENDPOINT = "https://api.fireflies.ai/graphql"
 query = """
 query LastTenTranscripts {
   transcripts(
-    limit: 1
+    limit: 10
     skip: 0
   ) {
      id
@@ -131,8 +130,8 @@ print('users_df carregado', users_df.shape)
 df = process_transcripts_to_df(transcripts, users_df)
 print('df carregado', df.shape)
 
-# df = df[~df['id'].isin(ids_df['id'])]
-# print('df filtrado', df.shape)
+df = df[~df['id'].isin(ids_df['id'])]
+print('df filtrado', df.shape)
 
 
 df.to_excel('transcripts.xlsx')
@@ -241,7 +240,6 @@ def gerar_message(row):
     </html>
     """
 
-    print(message)    
     return message
 
 df['message'] = df.apply(gerar_message, axis=1)
@@ -274,9 +272,9 @@ for _, row in df.iterrows():
     # Envia o e-mail com o PDF anexado
     
     yag.send(
-        to=['tiago.americano.03@gmail.com'],
-        # to=['tiago.americano.03@gmail.com']+email_list,
-        subject=f'Relatório Coach Invisível3 {row.date}',
+        # to=['tiago.americano.03@gmail.com'],
+        to=['tiago.americano.03@gmail.com']+email_list,
+        subject=f'Relatório Coach Invisível {row.date}',
         contents='Segue a baixo o relatório.',
         attachments=[html_file]  # Anexa o html gerado
     )
@@ -286,4 +284,4 @@ for _, row in df.iterrows():
 
 new_df = df[['id', 'names', 'email']]
 
-# pd.concat([new_df, ids_df])[['id', 'names', 'email']].to_excel('ids.xlsx')
+pd.concat([new_df, ids_df])[['id', 'names', 'email']].to_excel('ids.xlsx')
