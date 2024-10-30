@@ -355,35 +355,13 @@ def send_mail(subject, message, emails):
         arquivo.write(message)
     
     yag.send(
-        to=['tiago.americano.03@gmail.com'],
-        # to=['tiago.americano.03@gmail.com']+emails,
+        to=['tiago.americano.03@gmail.com']+emails,
         subject=subject,
         contents='Segue o relatório',
         attachments=[html_file]  # Anexa o PDF gerado
     )
 
-# for id in novos_ids:
-#     sentences = supabase.table("sentences").select("text").eq("transcript_id", id).execute().data
-#     transcript = supabase.table("transcripts").select("*").eq("id", id).execute().data[0]
 
-#     objecoes = identificar_objeções(str([sentence["text"] for sentence in sentences if "text" in sentence]))
-#     message = gerar_message(transcript, objecoes)
-    
-#     subject = f"Relatório Coach Invisível {datetime.fromisoformat(transcript['meet_date']).strftime('%d/%m/%Y')}"
-    
-#     response = (
-#         supabase.table("users")
-#         .select("email")
-#         .in_("id", transcript['speakers'])
-#         .execute()
-#     )
-#     emails_unicos = set()  # Usamos um conjunto para evitar duplicatas
-#     for user in response.data:
-#         emails = user.get("email", [])
-#         if emails:  # Verifica se há e-mails e não é uma lista vazia
-#             emails_unicos.update(emails)
-        
-#     send_mail(subject, message, list(emails_unicos))
 
 for id in novos_ids:
     sentences = supabase.table("sentences").select("*").eq("transcript_id", id).execute().data
