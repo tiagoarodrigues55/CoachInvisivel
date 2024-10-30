@@ -322,14 +322,17 @@ def gerar_message(row, objecoes, assistants):
 {converter_negrito_para_html(objecoes)}
                 </pre>
                     
-            {''.join(f"""
+{''.join(
+    f"""
                 <h3 style="color: #333;">Feedback do livro: {assistant['assistant_name']}</h3>
-                <pre style="color: #555; line-height: 1.6; background-color: #f7f7f7; 
-                            padding: 10px; border-radius: 5px; overflow-x: auto; 
+                <pre style="color: #555; line-height: 1.6; background-color: #f7f7f7;
+                            padding: 10px; border-radius: 5px; overflow-x: auto;
                             white-space: pre-wrap;">
-{converter_negrito_para_html(assistant['analysis_result'])}
+                {converter_negrito_para_html(assistant['analysis_result'])}
                 </pre>
-            """ for assistant in assistants)}
+    """ 
+    for assistant in assistants
+)}
                 
 
             </div>
