@@ -278,10 +278,12 @@ def gerar_message(row, objecoes, assistants):
 
     book_feedback = ''.join(
     f"""
-                <h3 style="color: #333;">Feedback do livro: {assistant['assistant_name']}</h3>
-                <pre style="color: #555; line-height: 1.6; background-color: #f7f7f7;
-                            padding: 10px; border-radius: 5px; overflow-x: auto;
-                            white-space: pre-wrap;">
+                <h3 style="color: #333; border-bottom: 2px solid #f0ad4e; padding-bottom: 5px;">
+                    Feedback do livro: {assistant['assistant_name']}
+                </h3>
+                <pre style="color: #555; line-height: 1.6; margin-bottom: 15px; 
+                            background-color: #f7f7f7; padding: 10px; border-radius: 5px; 
+                            overflow-x: auto; white-space: pre-wrap;">
                 {converter_negrito_para_html(assistant['analysis_result'])}
                 </pre>
     """ 
