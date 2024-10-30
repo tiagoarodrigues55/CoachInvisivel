@@ -276,19 +276,7 @@ def converter_negrito_para_html(texto):
 def gerar_message(row, objecoes, assistants):
     # Gera o HTML com os valores de cada linha.
 
-    book_feedback = ''.join(
-    f"""
-                <h3 style="color: #333; border-bottom: 2px solid #f0ad4e; padding-bottom: 5px;">
-                    Feedback do livro: {assistant['assistant_name']}
-                </h3>
-                <pre style="color: #555; line-height: 1.6; margin-bottom: 15px; 
-                            background-color: #f7f7f7; padding: 10px; border-radius: 5px; 
-                            overflow-x: auto; white-space: pre-wrap;">
-{converter_negrito_para_html(assistant['analysis_result'])}
-                </pre>
-    """ 
-    for assistant in assistants
-)
+
     message = f"""
     <html>
         <body style="font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 20px;">
@@ -336,9 +324,6 @@ def gerar_message(row, objecoes, assistants):
 {converter_negrito_para_html(objecoes)}
                 </pre>
                     
-{book_feedback}
-                
-
             </div>
         </body>
     </html>
@@ -410,4 +395,4 @@ for id in novos_ids:
     
     message = gerar_message(transcript, objecoes, assistants_final)
         
-    send_mail(subject, message, emails_final)
+    # send_mail(subject, message, emails_final)
