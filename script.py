@@ -284,7 +284,7 @@ def gerar_message(row, objecoes, assistants):
                 <pre style="color: #555; line-height: 1.6; margin-bottom: 15px; 
                             background-color: #f7f7f7; padding: 10px; border-radius: 5px; 
                             overflow-x: auto; white-space: pre-wrap;">
-                {converter_negrito_para_html(assistant['analysis_result'])}
+{converter_negrito_para_html(assistant['analysis_result'])}
                 </pre>
     """ 
     for assistant in assistants
