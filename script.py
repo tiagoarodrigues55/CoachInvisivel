@@ -7,7 +7,7 @@ import yagmail
 import os
 from supabase import create_client, Client
 import ast
-
+import time
 # Configuração
 
 
@@ -230,6 +230,41 @@ def identificar_objeções(sentencas):
 
 
 
+
+def analyze_transcription(sentencas, assistant_id):
+    # Formata o prompt com as sentenças fornecidas
+    prompt = (
+        "Analise as seguintes sentenças e gere feedbacks concisos para a reunião a partir do livro em anexo.\n\n"
+        + sentencas
+    )
+    
+    thread_id = client.beta.threads.create().id
+    client.beta.threads.messages.create(thread_id=thread_id, role="user", content=prompt)
+    get_request_run = client.beta.threads.runs.create(thread_id=thread_id, assistant_id=assistant_id)
+    wait_for_run_completion(thread_id, get_request_run.id)
+
+    messages = client.beta.threads.messages.list(thread_id=thread_id)
+    print(messages.data[0].content[0].text.value)
+    # Retorna apenas a mensagem do assistente
+    return messages.data[0].content[0].text.value
+
+
+
+def wait_for_run_completion(thread_id, run_id, timeout=300):
+    print(f"Waiting for run completion, thread ID: {thread_id}, run ID: {run_id}")
+    start_time = time.time()
+    while time.time() - start_time < timeout:
+        run_status = client.beta.threads.runs.retrieve(thread_id=thread_id, run_id=run_id)
+        if run_status.status == 'completed':
+            print("Run completed successfully.")
+            return run_status
+        time.sleep(10)
+    raise TimeoutError("Run did not complete within the specified timeout.")
+
+
+
+#%%
+
 import re
 
 def converter_negrito_para_html(texto):
@@ -238,12 +273,10 @@ def converter_negrito_para_html(texto):
     return texto_convertido
 
 
-def gerar_message(row, objecoes):
+def gerar_message(row, objecoes, assistants):
     # Gera o HTML com os valores de cada linha.
     message = f"""
     <html>
-    <meta charset="UTF-8">
-
         <body style="font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 20px;">
             <div style="background-color: #ffffff; padding: 20px; border-radius: 8px; 
                         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); max-width: 600px; margin: auto;">
@@ -288,15 +321,15 @@ def gerar_message(row, objecoes):
                             overflow-x: auto; white-space: pre-wrap;">
 {converter_negrito_para_html(objecoes)}
                 </pre>
-    
-                <h3 style="color: #333; border-bottom: 2px solid #f0ad4e; padding-bottom: 5px;">
-                    Próximos passos
-                </h3>
-                <pre style="color: #555; line-height: 1.6; margin-bottom: 15px; 
-                            background-color: #f7f7f7; padding: 10px; border-radius: 5px; 
-                            overflow-x: auto; white-space: pre-wrap;">
-{converter_negrito_para_html(row['shorthand_bullet'])}
+                    
+            {''.join(f"""
+                <h3 style="color: #333;">Feedback do livro: {assistant['assistant_name']}</h3>
+                <pre style="color: #555; line-height: 1.6; background-color: #f7f7f7; 
+                            padding: 10px; border-radius: 5px; overflow-x: auto; 
+                            white-space: pre-wrap;">
+{converter_negrito_para_html(assistant['analysis_result'])}
                 </pre>
+            """ for assistant in assistants)}
                 
 
             </div>
@@ -309,38 +342,87 @@ def gerar_message(row, objecoes):
 
 
 
-
 def send_mail(subject, message, emails):
     html_file = 'relatorio.html'
     with open(html_file, "w", encoding="utf-8") as arquivo:
         arquivo.write(message)
     
     yag.send(
-        to=['tiago.americano.03@gmail.com']+emails,
+        to=['tiago.americano.03@gmail.com'],
+        # to=['tiago.americano.03@gmail.com']+emails,
         subject=subject,
         contents='Segue o relatório',
         attachments=[html_file]  # Anexa o PDF gerado
     )
 
+# for id in novos_ids:
+#     sentences = supabase.table("sentences").select("text").eq("transcript_id", id).execute().data
+#     transcript = supabase.table("transcripts").select("*").eq("id", id).execute().data[0]
+
+#     objecoes = identificar_objeções(str([sentence["text"] for sentence in sentences if "text" in sentence]))
+#     message = gerar_message(transcript, objecoes)
+    
+#     subject = f"Relatório Coach Invisível {datetime.fromisoformat(transcript['meet_date']).strftime('%d/%m/%Y')}"
+    
+#     response = (
+#         supabase.table("users")
+#         .select("email")
+#         .in_("id", transcript['speakers'])
+#         .execute()
+#     )
+#     emails_unicos = set()  # Usamos um conjunto para evitar duplicatas
+#     for user in response.data:
+#         emails = user.get("email", [])
+#         if emails:  # Verifica se há e-mails e não é uma lista vazia
+#             emails_unicos.update(emails)
+        
+#     send_mail(subject, message, list(emails_unicos))
+
 for id in novos_ids:
-    sentences = supabase.table("sentences").select("text").eq("transcript_id", id).execute().data
+    sentences = supabase.table("sentences").select("*").eq("transcript_id", id).execute().data
     transcript = supabase.table("transcripts").select("*").eq("id", id).execute().data[0]
 
-    objecoes = identificar_objeções(str([sentence["text"] for sentence in sentences if "text" in sentence]))
-    message = gerar_message(transcript, objecoes)
     
     subject = f"Relatório Coach Invisível {datetime.fromisoformat(transcript['meet_date']).strftime('%d/%m/%Y')}"
     
     response = (
-        supabase.table("users")
-        .select("email")
-        .in_("id", transcript['speakers'])
+        supabase.table("user_assistants_view")
+        .select("*")
+        .in_("user_id", transcript['speakers'])
         .execute()
     )
-    emails_unicos = set()  # Usamos um conjunto para evitar duplicatas
+    emails_unicos = set()  # Conjunto para evitar e-mails duplicados
+    assistants_unicos = set()  # Conjunto para evitar duplicatas de assistentes
+    
     for user in response.data:
-        emails = user.get("email", [])
+        emails = user.get("user_email", [])
+        assistant_id = user.get("assistant_id")  # Extrai os assistants
+        assistant_name = user.get("assistant_name")
+
         if emails:  # Verifica se há e-mails e não é uma lista vazia
             emails_unicos.update(emails)
+            
+        if assistant_id and assistant_name:
+            assistants_unicos.add((assistant_id, assistant_name))
+    
+    # Converte o conjunto de e-mails para lista
+    emails_final = list(emails_unicos)
+    
+    # Converte o conjunto de assistentes para uma lista de dicionários
+    assistants_final = [{"assistant_id": aid, "assistant_name": aname} for aid, aname in assistants_unicos]
+
+
+    for assistant in assistants_final:
+        # Extrai as sentenças de forma concatenada como string
+        sentences_text = str([sentence["text"] for sentence in sentences if "text" in sentence])
         
-    send_mail(subject, message, list(emails_unicos))
+        # Executa a análise passando as sentenças e o assistant_id
+        analysis_result = analyze_transcription(sentences_text, assistant["assistant_id"])
+        
+        # Adiciona o resultado da análise ao dicionário do assistente
+        assistant["analysis_result"] = analysis_result
+    objecoes = identificar_objeções(str([sentence["text"] for sentence in sentences if "text" in sentence]))
+    
+    message = gerar_message(transcript, objecoes, assistants_final)
+        
+    send_mail(subject, message, emails_final)
