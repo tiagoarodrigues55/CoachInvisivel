@@ -273,7 +273,7 @@ def converter_negrito_para_html(texto):
     return texto_convertido
 
 
-def gerar_message(row, objecoes, assistants):
+def gerar_message(row, objecoes):
     # Gera o HTML com os valores de cada linha.
 
 
@@ -340,7 +340,9 @@ def send_mail(subject, message, emails):
         arquivo.write(message)
     
     yag.send(
-        to=['tiago.americano.03@gmail.com']+emails,
+        to=['tiago.americano.03@gmail.com'],
+        # to=['tiago.americano.03@gmail.com']+emails,
+
         subject=subject,
         contents='Segue o relatório',
         attachments=[html_file]  # Anexa o PDF gerado
@@ -362,37 +364,19 @@ for id in novos_ids:
         .execute()
     )
     emails_unicos = set()  # Conjunto para evitar e-mails duplicados
-    assistants_unicos = set()  # Conjunto para evitar duplicatas de assistentes
     
     for user in response.data:
         emails = user.get("user_email", [])
-        assistant_id = user.get("assistant_id")  # Extrai os assistants
-        assistant_name = user.get("assistant_name")
 
         if emails:  # Verifica se há e-mails e não é uma lista vazia
             emails_unicos.update(emails)
-            
-        if assistant_id and assistant_name:
-            assistants_unicos.add((assistant_id, assistant_name))
     
     # Converte o conjunto de e-mails para lista
     emails_final = list(emails_unicos)
     
-    # Converte o conjunto de assistentes para uma lista de dicionários
-    assistants_final = [{"assistant_id": aid, "assistant_name": aname} for aid, aname in assistants_unicos]
 
-
-    for assistant in assistants_final:
-        # Extrai as sentenças de forma concatenada como string
-        sentences_text = str([sentence["text"] for sentence in sentences if "text" in sentence])
-        
-        # Executa a análise passando as sentenças e o assistant_id
-        analysis_result = analyze_transcription(sentences_text, assistant["assistant_id"])
-        
-        # Adiciona o resultado da análise ao dicionário do assistente
-        assistant["analysis_result"] = analysis_result
     objecoes = identificar_objeções(str([sentence["text"] for sentence in sentences if "text" in sentence]))
     
-    message = gerar_message(transcript, objecoes, assistants_final)
+    message = gerar_message(transcript, objecoes)
         
-    # send_mail(subject, message, emails_final)
+    send_mail(subject, message, emails_final)
