@@ -231,37 +231,6 @@ def identificar_objeções(sentencas):
 
 
 
-def analyze_transcription(sentencas, assistant_id):
-    # Formata o prompt com as sentenças fornecidas
-    prompt = (
-        "Analise as seguintes sentenças e gere feedbacks concisos para a reunião a partir do livro em anexo.\n\n"
-        + sentencas
-    )
-    
-    thread_id = client.beta.threads.create().id
-    client.beta.threads.messages.create(thread_id=thread_id, role="user", content=prompt)
-    get_request_run = client.beta.threads.runs.create(thread_id=thread_id, assistant_id=assistant_id)
-    wait_for_run_completion(thread_id, get_request_run.id)
-
-    messages = client.beta.threads.messages.list(thread_id=thread_id)
-    print(messages.data[0].content[0].text.value)
-    # Retorna apenas a mensagem do assistente
-    return messages.data[0].content[0].text.value
-
-
-
-def wait_for_run_completion(thread_id, run_id, timeout=300):
-    print(f"Waiting for run completion, thread ID: {thread_id}, run ID: {run_id}")
-    start_time = time.time()
-    while time.time() - start_time < timeout:
-        run_status = client.beta.threads.runs.retrieve(thread_id=thread_id, run_id=run_id)
-        if run_status.status == 'completed':
-            print("Run completed successfully.")
-            return run_status
-        time.sleep(10)
-    raise TimeoutError("Run did not complete within the specified timeout.")
-
-
 
 #%%
 
