@@ -309,7 +309,7 @@ def send_mail(subject, message, emails):
         arquivo.write(message)
     
     yag.send(
-        to=['tiago.americano.03@gmail.com'],
+        to=['pedro.ferrufino@greatpeople.com'],
         # to=['tiago.americano.03@gmail.com']+emails,
 
         subject=subject,
@@ -317,7 +317,7 @@ def send_mail(subject, message, emails):
         attachments=[html_file]  # Anexa o PDF gerado
     )
 
-
+novos_ids = [15, 17, 19, 18, 20, 21]
 
 for id in novos_ids:
     sentences = supabase.table("sentences").select("*").eq("transcript_id", id).execute().data
