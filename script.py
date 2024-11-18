@@ -228,6 +228,35 @@ def identificar_objeções(sentencas):
     return completion.choices[0].message.content.replace('```', '').replace('html', '')  # Acessando o conteúdo corretamente
 
 
+def identificar_softskills(sentencas):
+    # Formata o prompt com as sentenças fornecidas
+    prompt = (
+        """Você é um analista de reuniões experiente, capaz de identificar objetivos, avaliar resultados e destacar soft skills envolvidos em discussões. A partir da transcrição abaixo, forneça uma análise curta e objetiva com os seguintes pontos:
+
+            Objetivo da reunião: Identifique e descreva o objetivo principal da reunião.
+            Foi atingido? Diga se o objetivo foi alcançado e justifique brevemente sua resposta.
+            Soft skills que ajudaram: Liste as habilidades interpessoais que contribuíram positivamente para o andamento da reunião e o atingimento dos objetivos.
+            Soft skills que atrapalharam: Liste as habilidades interpessoais ou comportamentos que dificultaram ou atrapalharam o andamento da reunião.
+            Transcrição da reunião:
+            {sentencas}
+
+            Formato da resposta:
+
+            Objetivo da reunião: [resposta curta]
+            Foi atingido? [sim/não + justificativa curta]
+            Soft skills que ajudaram: [lista]
+        """
+    )
+    # Chamada para a API da OpenAI
+    completion = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[{"role": "user", "content": prompt}]
+    )
+
+    # Retorna a resposta da API
+    return completion.choices[0].message.content
+
+
 
 
 
@@ -242,7 +271,7 @@ def converter_negrito_para_html(texto):
     return texto_convertido
 
 
-def gerar_message(row, objecoes):
+def gerar_message(row, objecoes, softskills):
     # Gera o HTML com os valores de cada linha.
 
 
@@ -292,6 +321,15 @@ def gerar_message(row, objecoes):
                             overflow-x: auto; white-space: pre-wrap;">
 {converter_negrito_para_html(objecoes)}
                 </pre>
+
+                <h3 style="color: #333; border-bottom: 2px solid #f0ad4e; padding-bottom: 5px;">
+                    Sftskills
+                </h3>
+                <pre style="color: #555; line-height: 1.6; margin-bottom: 15px; 
+                            background-color: #f7f7f7; padding: 10px; border-radius: 5px; 
+                            overflow-x: auto; white-space: pre-wrap;">
+{converter_negrito_para_html(softskills)}
+                </pre>
                     
             </div>
         </body>
@@ -309,7 +347,7 @@ def send_mail(subject, message, emails):
         arquivo.write(message)
     
     yag.send(
-        to=['tiago.americano.03@gmail.com']+emails,
+        to=emails,
         subject=subject,
         contents='Segue o relatório',
         attachments=[html_file]  # Anexa o PDF gerado
@@ -324,9 +362,9 @@ for id in novos_ids:
     subject = f"Relatório Coach Invisível {datetime.fromisoformat(transcript['meet_date']).strftime('%d/%m/%Y')}"
     
     response = (
-        supabase.table("user_assistants_view")
+        supabase.table("users")
         .select("*")
-        .in_("user_id", transcript['speakers'])
+        .in_("id", transcript['speakers'])
         .execute()
     )
     emails_unicos = set()  # Conjunto para evitar e-mails duplicados
@@ -342,6 +380,8 @@ for id in novos_ids:
     
 
     objecoes = identificar_objeções(str([sentence["text"] for sentence in sentences if "text" in sentence]))
+    softskills = identificar_softskills(str([sentence["text"] for sentence in sentences if "text" in sentence]))
+
     
     message = gerar_message(transcript, objecoes)
         

@@ -1,117 +1,101 @@
-# README - Script de Integração com Fireflies e OpenAI
+# Projeto: Coach Invisível - Processamento e Envio de Transcritos
 
-## Descrição
+## Visão Geral
+Este projeto tem como objetivo processar transcritos de reuniões, analisar seus conteúdos e gerar relatórios detalhados para envio automatizado via e-mail. Utiliza integração com a API Fireflies.ai, OpenAI, Supabase e Yagmail para automação e gerenciamento de dados.
 
-Este script automatiza a coleta de transcrições de reuniões via API da Fireflies, processa os dados utilizando **Python** e **OpenAI**, e envia relatórios formatados por e-mail. Ele realiza análise de sentenças, identifica objeções e gera mensagens customizadas em HTML, que são convertidas em anexos para envio automático.
+## Funcionalidades Principais
+- Consulta e processamento de transcritos via API Fireflies.ai.
+- Integração com a OpenAI para identificação de objeções e soft skills.
+- Gerenciamento de usuários e transcritos em um banco de dados Supabase.
+- Geração de relatórios detalhados em HTML e envio automatizado de e-mails via Yagmail.
 
-## Funcionalidades
+## Tecnologias Utilizadas
+- **Linguagem**: Python
+- **APIs**: Fireflies.ai, OpenAI
+- **Banco de Dados**: Supabase
+- **Envio de E-mail**: Yagmail
+- **Outros**: Pandas, Requests, os (variáveis de ambiente)
 
-- **Coleta de transcrições**: Utiliza a API da Fireflies para obter as últimas 10 transcrições de reuniões.
-- **Processamento de dados**: Extrai informações relevantes e as organiza em um DataFrame.
-- **Identificação de objeções**: Utiliza a API da OpenAI para identificar objeções nas conversas.
-- **Geração de e-mails personalizados**: Cria relatórios em HTML com base nas transcrições.
-- **Envio automático de e-mails**: Envia os relatórios para destinatários correspondentes.
-  
----
+## Configuração do Ambiente
 
-## Requisitos
+1. **Instale as dependências**:
+   ```bash
+   pip install requests pandas openai yagmail supabase
+   ```
 
-- **Python 3.x**
-- **Pacotes**:
-  - `requests`
-  - `pandas`
-  - `openai`
-  - `yagmail`
-  - `json`
-  - `datetime`
-  - `os`
-  - `re`
+2. **Configuração de variáveis de ambiente**:
+   Crie um arquivo `.env` na raiz do projeto e adicione as seguintes chaves:
+   ```env
+   OPENAI_API_KEY=your_openai_key
+   FIRELIES_API_KEY=your_fireflies_key
+   EMAIL_PASSWORD=your_email_password
+   SUPABASE_URL=your_supabase_url
+   SUPABASE_KEY=your_supabase_key
+   ```
 
-Instale as dependências executando:
+3. **Conexão com o Supabase**:
+   Configure o cliente Supabase com as variáveis `SUPABASE_URL` e `SUPABASE_KEY`.
+
+## Uso
+
+### Execução do Script Principal
+1. **Processar transcritos**:
+   O script faz uma requisição à API Fireflies para buscar transcritos das últimas reuniões.
+
+2. **Gerenciar usuários e transcritos**:
+   - Verifica no banco de dados se o usuário e os transcritos já existem.
+   - Insere novos registros e associações.
+
+3. **Análise de Objeções e Soft Skills**:
+   Utiliza a API OpenAI para gerar relatórios de objeções e soft skills a partir das sentenças das reuniões.
+
+4. **Envio de E-mails**:
+   - Cria um relatório HTML detalhado com informações da reunião.
+   - Envia o e-mail para os participantes da reunião usando Yagmail.
+
+### Exemplo de Execução
+Execute o script principal:
 ```bash
-pip install requests pandas openai yagmail
+python main.py
 ```
 
----
+## Funções Principais
 
-## Variáveis de Ambiente
+### Carregar e Gerenciar Usuários
+- **`carregar_usuarios()`**: Carrega todos os usuários existentes no banco de dados.
+- **`obter_ou_criar_user_id(nome, user_cache)`**: Verifica ou insere um novo usuário no banco.
 
-Configure as seguintes variáveis de ambiente no seu sistema para garantir o funcionamento:
+### Processamento de Transcritos
+- **`process_transcripts_to_df(transcripts, user_cache)`**: Converte os transcritos em um DataFrame processado.
+- **`verificar_e_inserir_transcripts(transcripts, user_cache)`**: Verifica e insere novos transcritos no banco de dados.
+- **`inserir_sentences_em_lote(transcript_id, sentences, user_cache)`**: Insere as sentenças processadas no banco.
 
-- **OPENAI_API_KEY**: Chave de API da OpenAI.
-- **FIRELIES_API_KEY**: Chave de API da Fireflies.
-- **EMAIL_PASSWORD**: Senha do e-mail utilizado para envio de relatórios.
+### Análise de Dados
+- **`identificar_objeções(sentencas)`**: Identifica objeções levantadas nas transcrições.
+- **`identificar_softskills(sentencas)`**: Analisa as soft skills utilizadas nas reuniões.
 
-Adicione-as no terminal:
-```bash
-export OPENAI_API_KEY='sua-chave-aqui'
-export FIRELIES_API_KEY='sua-chave-aqui'
-export EMAIL_PASSWORD='sua-senha-aqui'
+### Geração e Envio de Relatórios
+- **`converter_negrito_para_html(texto)`**: Converte marcadores em negrito para tags HTML.
+- **`gerar_message(row, objecoes, softskills)`**: Gera um relatório HTML com resumo e insights.
+- **`send_mail(subject, message, emails)`**: Envia o e-mail com o relatório gerado.
+
+## Estrutura do Projeto
+```
+project/
+├── main.py              # Script principal
+├── requirements.txt   # Dependências do projeto
+├── .env               # Configurações de ambiente
+├── README.md          # Documentação do projeto
 ```
 
----
+## Melhoria Contínua
+- **Automatização de testes**: Adicionar testes unitários para as principais funções.
+- **Manutenção de logs**: Implementar logs para monitorar erros e sucessos.
+- **Integração CI/CD**: Automatizar a implantação do projeto.
 
-## Estrutura do Código
+## Contribuições
+Sinta-se à vontade para abrir issues ou enviar pull requests com melhorias ou correções.
 
-1. **Consulta à API Fireflies**:
-   - Recupera as últimas 10 transcrições.
-   - Filtra as transcrições pelo período dos últimos 7 dias.
+## Licença
+Este projeto está sob a licença MIT. Consulte o arquivo `LICENSE` para mais detalhes.
 
-2. **Processamento dos Dados**:
-   - Converte datas para o fuso horário de Brasília.
-   - Verifica nomes dos participantes e associa e-mails através do arquivo `users.xlsx`.
-
-3. **Análise com OpenAI**:
-   - Extrai objeções das sentenças utilizando a API da OpenAI.
-
-4. **Geração de Relatórios HTML**:
-   - Formata as informações em HTML.
-   - Converte texto em negrito para tags `<b>`.
-
-5. **Envio de E-mails**:
-   - Utiliza `yagmail` para enviar os relatórios por e-mail.
-   - Os dados processados são salvos em `transcripts.xlsx`.
-
----
-
-## Como Utilizar
-
-1. **Preparar os arquivos de entrada**:
-   - `ids.xlsx`: Arquivo contendo os IDs já processados.
-   - `users.xlsx`: Arquivo com mapeamento de nomes e e-mails dos participantes.
-
-2. **Executar o script**:
-   - Execute o script no terminal:
-     ```bash
-     python seu_script.py
-     ```
-
-3. **Verificação e envio**:
-   - Se houver novas transcrições, os e-mails serão enviados automaticamente.
-   - O arquivo `ids.xlsx` será atualizado com os novos registros.
-
----
-
-## Exemplo de Saída
-
-- **HTML Gerado**:
-  - Resumo principal da reunião.
-  - Lista de objeções identificadas.
-  - Itens de ação e próximos passos.
-
-- **Arquivo Final**:
-  - `transcripts.xlsx`: Consolidado das transcrições e informações relevantes.
-
----
-
-## Possíveis Erros e Soluções
-
-- **Erro de autenticação**: Verifique as chaves de API nas variáveis de ambiente.
-- **Erro ao enviar e-mails**: Confirme a senha e permissões da conta de e-mail.
-- **Transcrições ausentes**: Certifique-se de que o período consultado possui reuniões registradas.
-
----
-
-## Contato
-
-Em caso de dúvidas ou sugestões, entre em contato pelo e-mail **admin@coachinvisivel.com**.
